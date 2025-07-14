@@ -62,21 +62,21 @@ app.post("/lecturer-feedback", async (req, res) => {
   }
 
   try {
-    const nameQuery = new RegExp(lecturer.name.replace(/\./g, ""), "i");
+    const nameQuery = new RegExp(lecturer.name, "i");
 
-const feedbacks = await Feedback.find({
-  lecturer: { $regex: nameQuery },
-  course: { $in: lecturer.courses },
-  approved: true,
-}).sort({ createdAt: -1 });
-
-
+    const feedbacks = await Feedback.find({
+      lecturer: { $regex: nameQuery },
+      course: { $in: lecturer.courses },
+      approved: true,
+    }).sort({ createdAt: -1 });
 
     res.json({ lecturer: lecturer.name, courses: lecturer.courses, feedbacks });
   } catch (err) {
+    console.error("Fetch error:", err);
     res.status(500).json({ error: "Error fetching feedback" });
   }
 });
+
 app.get("/admin/feedback", async (req, res) => {
   try {
     const feedbacks = await Feedback.find().sort({ createdAt: -1 });
