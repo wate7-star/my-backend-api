@@ -29,14 +29,8 @@ app.post("/feedback", async (req, res) => {
   }
 });
 const lecturerAccess = {
-  "mdLaura": { name: "Laura", courses: ["Analysis and Design of user interface"] },
-  "mrMachoge": { name: "Machoge", courses: ["Multimedia systems"] },
-  "mdJoyce": { name: "Joyce", courses: ["issues in web design" ] },
-  "mrDismus": { name: "Dismus", courses: ["Project proposal"] },
-  "mrAndrew": { name: "Andrew", courses: ["Artificial intelligence"] },
-  "mrJustin": { name: "Justin", courses: ["Mobile Application Programming"] },
-  "mrJohn": { name: "John", courses: ["Network Administration"] },
-  
+  "dr-smith123": { name: "Dr. Smith", courses: ["Data Structures", "Algorithms"] },
+  "ms-jane456": { name: "Ms. Jane", courses: ["English 101", "Poetry"] },
 };
 
 app.post("/lecturer-feedback", async (req, res) => {
