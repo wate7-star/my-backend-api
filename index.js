@@ -6,7 +6,13 @@ require("dotenv").config();
 const Feedback = require("./models/Feedback");
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://anon-feedback-alpha.vercel.app", // ✅ use your actual Vercel domain
+    methods: ["GET", "POST", "PATCH"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Connect to MongoDB
