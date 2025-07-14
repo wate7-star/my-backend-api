@@ -1,12 +1,29 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
+
 require("dotenv").config();
 
 const Feedback = require("./models/Feedback");
 
 const app = express();
-app.use(cors());
+const cors = require("cors");
+
+const allowedOrigins = [
+  "https://anon-feedback-alpha.vercel.app", // your frontend domain
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+}));
+
 app.use(express.json());
 
 // Connect to MongoDB
