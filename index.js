@@ -6,13 +6,7 @@ require("dotenv").config();
 const Feedback = require("./models/Feedback");
 
 const app = express();
-app.use(
-  cors({
-    origin: "https://anon-feedback-alpha.vercel.app", // ✅ use your actual Vercel domain
-    methods: ["GET", "POST", "PATCH"],
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
@@ -55,22 +49,17 @@ app.post("/lecturer-feedback", async (req, res) => {
 
   try {
     const feedbacks = await Feedback.find({
-      lecturer: {
-        $elemMatch: {
-          $regex: lecturer.name,
-          $options: "i"
-        }
-      },
-      course: { $in: lecturer.courses },
-      approved: true,
-    }).sort({ createdAt: -1 });
+  lecturer: lecturer.name,
+  course: { $in: lecturer.courses },
+  approved: true,
+}).sort({ createdAt: -1 });
+
 
     res.json({ lecturer: lecturer.name, courses: lecturer.courses, feedbacks });
   } catch (err) {
     res.status(500).json({ error: "Error fetching feedback" });
   }
 });
-
 app.get("/admin/feedback", async (req, res) => {
   try {
     const feedbacks = await Feedback.find().sort({ createdAt: -1 });
