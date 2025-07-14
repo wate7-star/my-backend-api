@@ -29,8 +29,14 @@ app.post("/feedback", async (req, res) => {
   }
 });
 const lecturerAccess = {
-  "dr-smith123": { name: "Dr. Smith", courses: ["Data Structures", "Algorithms"] },
-  "ms-jane456": { name: "Ms. Jane", courses: ["English 101", "Poetry"] },
+  "mdLaura": { name: "Laura", courses: ["Analysis and Design of user interface"] },
+  "mrMachoge": { name: "Machoge", courses: ["Multimedia systems"] },
+  "mdJoyce": { name: "Joyce", courses: ["issues in web design" ] },
+  "mrDismus": { name: "Dismus", courses: ["Project proposal"] },
+  "mrAndrew": { name: "Andrew", courses: ["Artificial intelligence"] },
+  "mrJustin": { name: "Justin", courses: ["Mobile Application Programming"] },
+  "mrJohn": { name: "John", courses: ["Network Administration"] },
+  
 };
 
 app.post("/lecturer-feedback", async (req, res) => {
@@ -43,17 +49,22 @@ app.post("/lecturer-feedback", async (req, res) => {
 
   try {
     const feedbacks = await Feedback.find({
-  lecturer: lecturer.name,
-  course: { $in: lecturer.courses },
-  approved: true,
-}).sort({ createdAt: -1 });
-
+      lecturer: {
+        $elemMatch: {
+          $regex: lecturer.name,
+          $options: "i"
+        }
+      },
+      course: { $in: lecturer.courses },
+      approved: true,
+    }).sort({ createdAt: -1 });
 
     res.json({ lecturer: lecturer.name, courses: lecturer.courses, feedbacks });
   } catch (err) {
     res.status(500).json({ error: "Error fetching feedback" });
   }
 });
+
 app.get("/admin/feedback", async (req, res) => {
   try {
     const feedbacks = await Feedback.find().sort({ createdAt: -1 });
