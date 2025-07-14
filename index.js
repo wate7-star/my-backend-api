@@ -68,22 +68,28 @@ app.post("/lecturer-feedback", async (req, res) => {
   }
 
   try {
+    const normalize = (str) => str.toLowerCase().replace(/\s+/g, "").replace(/\./g, "");
+
     const normalizedLecturerName = normalize(lecturer.name);
+    const normalizedCourses = lecturer.courses.map(normalize);
 
-    const allFeedbacks = await Feedback.find({
-      course: { $in: lecturer.courses },
-      approved: true,
-    }).sort({ createdAt: -1 });
+    // Get all approved feedbacks
+    const allFeedbacks = await Feedback.find({ approved: true }).sort({ createdAt: -1 });
 
-    // Only return feedback where the lecturer name matches (case and space/period insensitive)
-    const feedbacks = allFeedbacks.filter(fb => normalize(fb.lecturer) === normalizedLecturerName);
+    // Filter by normalized lecturer AND normalized course
+    const feedbacks = allFeedbacks.filter(fb => {
+      const fbLecturer = normalize(fb.lecturer);
+      const fbCourse = normalize(fb.course);
+      return fbLecturer.includes(normalizedLecturerName) && normalizedCourses.includes(fbCourse);
+    });
 
     res.json({ lecturer: lecturer.name, courses: lecturer.courses, feedbacks });
   } catch (err) {
-    console.error("Fetch error:", err);
+    console.error("Error fetching feedback:", err);
     res.status(500).json({ error: "Error fetching feedback" });
   }
 });
+
 
 // ✅ Admin: Get all feedback
 app.get("/admin/feedback", async (req, res) => {
