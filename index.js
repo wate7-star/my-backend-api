@@ -34,10 +34,10 @@ const normalize = (name) => name.toLowerCase().replace(/\s|\./g, "");
 
 // ✅ Access codes and lecturer mapping
 const lecturerAccess = {
-  "mdJoyce": { name: "Joyce", courses: ["issues in web design"] },
-  "mdLaura": { name: "Laura", courses: ["analysis and design of user interface"] },
-  "mrDismus": { name: "Dismus", courses: ["project proposal"] },
-  "mrMachoge": { name: "Machoge", courses: ["Multimedia systems"] },
+  "mdjoyce": { name: "Joyce", courses: ["issues in web design"] },
+  "mdlaura": { name: "Laura", courses: ["analysis and design of user interface"] },
+  "mrdismus": { name: "Dismus", courses: ["project proposal"] },
+  "mrmachoge": { name: "Machoge", courses: ["Multimedia systems"] },
   "dr-smith123": { name: "Dr. Smith", courses: ["Data Structures", "Algorithms"] },
 };
 
