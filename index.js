@@ -1,16 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
-
+const cors = require("cors");
 require("dotenv").config();
 
 const Feedback = require("./models/Feedback");
 
 const app = express();
-const cors = require("cors");
 
-const allowedOrigins = [
-  "https://anon-feedback-alpha.vercel.app", // your frontend domain
-];
+// ✅ Whitelisted frontend domain
+const allowedOrigins = ["https://anon-feedback-alpha.vercel.app"];
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -26,33 +24,41 @@ app.use(cors({
 
 app.use(express.json());
 
-// Connect to MongoDB
+// ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB error:", err));
+  .catch((err) => console.error("❌ MongoDB error:", err));
 
-// Routes
+// ✅ Normalize function for name comparison
+const normalize = (name) => name.toLowerCase().replace(/\s|\./g, "");
+
+// ✅ Access codes and lecturer mapping
+const lecturerAccess = {
+  "mdJoyce": { name: "Joyce", courses: ["issues in web design"] },
+  "mdLaura": { name: "Laura", courses: ["analysis and design of user interface"] },
+  "mrDismus": { name: "Dismus", courses: ["project proposal"] },
+  "mrMachoge": { name: "Machoge", courses: ["Multimedia systems"] },
+  "dr-smith123": { name: "Dr. Smith", courses: ["Data Structures", "Algorithms"] },
+};
+
+// ✅ Root route
 app.get("/", (req, res) => {
-  res.send("Anonymous Feedback API is running");
+  res.send("🎉 Anonymous Feedback API is running");
 });
 
+// ✅ Submit feedback route
 app.post("/feedback", async (req, res) => {
   try {
     const feedback = new Feedback(req.body);
     await feedback.save();
     res.status(201).json({ message: "Feedback saved" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Failed to save feedback" });
   }
 });
-const lecturerAccess = {
-  "mdJoyce": { name: "Joyce", courses: ["issues in web design"] },
-  "mdLaura": { name: "Laura", courses: ["analysis and design of user interface"] },
-  "mrDismus": { name: "Dismus", courses: ["project proposal"] },
-  "mrMachoge": { name: "Machoge", courses: ["Multimedia systems"] },
-   "dr-smith123": { name: "Dr. Smith", courses: ["Data Structures", "Algorithms"] },
-};
 
+// ✅ Lecturer feedback (secure, flexible match)
 app.post("/lecturer-feedback", async (req, res) => {
   const { accessCode } = req.body;
 
@@ -62,13 +68,15 @@ app.post("/lecturer-feedback", async (req, res) => {
   }
 
   try {
-    const nameQuery = new RegExp(lecturer.name, "i");
+    const normalizedLecturerName = normalize(lecturer.name);
 
-    const feedbacks = await Feedback.find({
-      lecturer: { $regex: nameQuery },
+    const allFeedbacks = await Feedback.find({
       course: { $in: lecturer.courses },
       approved: true,
     }).sort({ createdAt: -1 });
+
+    // Only return feedback where the lecturer name matches (case and space/period insensitive)
+    const feedbacks = allFeedbacks.filter(fb => normalize(fb.lecturer) === normalizedLecturerName);
 
     res.json({ lecturer: lecturer.name, courses: lecturer.courses, feedbacks });
   } catch (err) {
@@ -77,6 +85,7 @@ app.post("/lecturer-feedback", async (req, res) => {
   }
 });
 
+// ✅ Admin: Get all feedback
 app.get("/admin/feedback", async (req, res) => {
   try {
     const feedbacks = await Feedback.find().sort({ createdAt: -1 });
@@ -86,6 +95,7 @@ app.get("/admin/feedback", async (req, res) => {
   }
 });
 
+// ✅ Admin: Approve/revoke feedback
 app.patch("/admin/feedback/:id", async (req, res) => {
   try {
     const updated = await Feedback.findByIdAndUpdate(req.params.id, {
@@ -97,7 +107,6 @@ app.patch("/admin/feedback/:id", async (req, res) => {
   }
 });
 
-
-// Start server
+// ✅ Start server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
