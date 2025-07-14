@@ -46,8 +46,10 @@ app.post("/feedback", async (req, res) => {
   }
 });
 const lecturerAccess = {
-  "dr-smith123": { name: "Dr. Smith", courses: ["Data Structures", "Algorithms"] },
-  "ms-jane456": { name: "Ms. Jane", courses: ["English 101", "Poetry"] },
+  "mdJoyce": { name: "Joyce", courses: ["issues in web design"] },
+  "mdLaura": { name: "Laura", courses: ["analysis and design of user interface"] },
+  "mrDismus": { name: "Dismus", courses: ["project proposal"] },
+  "mrMachoge": { name: "Machoge", courses: ["Multimedia systems"] },
 };
 
 app.post("/lecturer-feedback", async (req, res) => {
@@ -59,11 +61,14 @@ app.post("/lecturer-feedback", async (req, res) => {
   }
 
   try {
-    const feedbacks = await Feedback.find({
-  lecturer: lecturer.name,
+    const nameQuery = new RegExp(lecturer.name.replace(/\./g, ""), "i");
+
+const feedbacks = await Feedback.find({
+  lecturer: { $regex: nameQuery },
   course: { $in: lecturer.courses },
   approved: true,
 }).sort({ createdAt: -1 });
+
 
 
     res.json({ lecturer: lecturer.name, courses: lecturer.courses, feedbacks });
