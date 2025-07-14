@@ -50,6 +50,7 @@ const lecturerAccess = {
   "mdLaura": { name: "Laura", courses: ["analysis and design of user interface"] },
   "mrDismus": { name: "Dismus", courses: ["project proposal"] },
   "mrMachoge": { name: "Machoge", courses: ["Multimedia systems"] },
+   "dr-smith123": { name: "Dr. Smith", courses: ["Data Structures", "Algorithms"] },
 };
 
 app.post("/lecturer-feedback", async (req, res) => {
